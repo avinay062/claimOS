@@ -27,6 +27,17 @@ const claimSchema = new mongoose.Schema({
   channel: [String],
   region: [String],
   expiryDate: Date,
+  // Phase 3 — Risk Assessment
+  riskLevel: { type: String, enum: ['low', 'medium', 'high'], default: 'low' },
+  riskScore: { type: Number, default: 0 },
+  flaggedWords: [{ word: String, riskLevel: String, category: String }],
+  reassessmentDueDate: Date,
+  // Phase 3 — Project link
+  projectId: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
+  // Parent/child hierarchy (Phase 2 extension)
+  parentClaimId: { type: mongoose.Schema.Types.ObjectId, ref: 'Claim' },
+  copiedFromId: { type: mongoose.Schema.Types.ObjectId, ref: 'Claim' },
+  // Workflow
   eSignatures: [eSignatureSchema],
   statusHistory: [historySchema],
   notes: String,
@@ -36,5 +47,8 @@ const claimSchema = new mongoose.Schema({
 
 claimSchema.index({ product: 1, status: 1 });
 claimSchema.index({ statement: 1 });
+claimSchema.index({ riskLevel: 1 });
+claimSchema.index({ projectId: 1 });
+claimSchema.index({ title: 'text' });
 
 module.exports = mongoose.model('Claim', claimSchema);
